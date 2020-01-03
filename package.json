@@ -1,0 +1,30 @@
+{
+  "name": "mqtt-broker",
+  "version": "1.0.0",
+  "description": "FarmLab MQTT Broker",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "nodemon --watch '**/*.ts' --ignore 'node_modules' --exec 'ts-node' index.ts",
+    "build": "tsc --build",
+    "docker:build": "docker build -f docker/Dockerfile .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jp19-lafa/Broker.git"
+  },
+  "author": "Matthias Willemsen <matthias@mira.systems>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jp19-lafa/Broker/issues"
+  },
+  "homepage": "https://github.com/jp19-lafa/Broker#readme",
+  "dependencies": {
+    "mosca": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/mosca": "^2.8.2",
+    "@types/node": "^12.12.22",
+    "typescript": "^3.7.4"
+  }
+}
