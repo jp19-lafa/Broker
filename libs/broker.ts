@@ -1,5 +1,10 @@
 import { Server, Client, Packet } from 'mosca';
 import { get as config } from 'config';
+import { log } from './logger';
+
+// Providers
+import { AuthenticationProvider } from '../providers/authentication';
+import { StatusProvider } from '../providers/status';
 
 var settings = {
   port: <number>config('port'),
@@ -13,12 +18,16 @@ var settings = {
 
 export class Broker {
 
-  protected server: Server;
+  protected server!: Server;
+  protected authProvider = new AuthenticationProvider();
+  protected statusProvider = new StatusProvider();
 
   constructor() {
-    this.server = new Server(settings);
-    this.registerCallbacks();
-    this.registerAuth();
+    this.statusProvider.resetStatus().then(() => {
+      this.server = new Server(settings);
+      this.registerCallbacks();
+      this.registerAuth();
+    });
   }
 
   protected registerCallbacks() {
@@ -34,27 +43,43 @@ export class Broker {
     this.server.authorizeSubscribe = this.authorizeSubscribe;
   }
 
-  protected clientConnected(client: Client) {
-    console.log('Client Connected', client);
+  protected clientConnected = (client: Client) => {
+    log.info(`Client Connected: ${client.id}`);
+    if (this.isNode(client.id)) this.statusProvider.updateStatus(client.id, true);
   }
 
-  protected clientDisconnected(client: Client) { }
+  protected clientDisconnected = (client: Client) => {
+    log.info(`Client Disconnected: ${client.id}`);
+    if (this.isNode(client.id)) this.statusProvider.updateStatus(client.id, false);
+  }
 
-  protected published(packet: Packet, client: Client) { }
+  protected published = (packet: Packet, client: Client) => { }
 
   protected ready() {
-    console.log(`MQTT Server running on internal port ${settings.port}`);
+    log.info(`MQTT Server (PORT ${settings.port}/INTERNAL)`);
   }
 
-  protected authenticate(client: Client, username: string, password: string, callback: (obj: any, authenticated: boolean) => void) {
-    const authenticated = (username === 'farmlab' && password.toString() === 'ThisIsATestPasswordThatWeShouldChangeASAP');
-    callback(null, authenticated);
+  protected authenticate = async (client: Client, username: string, password: string, callback: (obj: any, authenticated: boolean) => void) => {
+    log.debug(`Connection Attempt by ${client.id}`);
+    const authorized: boolean = await this.authProvider.isAllowedToConnect(client.id, username, password.toString());
+    if (!authorized) log.debug(`Connection Failed for ${client.id} (UNAUTHORIZED)`);
+    callback(null, authorized);
   }
-  protected authorizePublish(client: Client, topic: string, payload: string, callback: (obj: any, authenticated: boolean) => void) {
-    callback(null, true);
+  protected authorizePublish = async (client: Client, topic: string, payload: string, callback: (obj: any, authenticated: boolean) => void) => {
+    const authorized: boolean = (topic.split('/').length === 3 && topic.split('/')[0] === client.id);
+    callback(null, authorized);
   }
-  protected authorizeSubscribe = function (client: Client, topic: string, callback: (obj: any, authenticated: boolean) => void) {
-    callback(null, true);
+  protected authorizeSubscribe = async (client: Client, topic: string, callback: (obj: any, authenticated: boolean) => void) => {
+    const authorized: boolean = (topic.split('/')[0] === client.id || client.id.includes('core-server'));
+    callback(null, authorized);
+  }
+
+  protected isNode(client: string) {
+    return new RegExp('([0-9A-F]{2}[:]){5}([0-9A-F]{2})[/][a-z]+[/][a-z]+').test(client);
+  }
+
+  protected isServer(client: string) {
+    return client.includes('core-server');
   }
 
   public Listen() { }

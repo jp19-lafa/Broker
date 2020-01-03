@@ -20,14 +20,18 @@
   },
   "homepage": "https://github.com/jp19-lafa/Broker#readme",
   "dependencies": {
-    "mosca": "^2.8.3",
+    "@sentry/node": "^5.10.2",
     "config": "^3.2.4",
-    "@sentry/node": "^5.10.2"
+    "got": "^10.2.1",
+    "mosca": "^2.8.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
+    "@types/config": "^0.0.36",
+    "@types/got": "^9.6.9",
     "@types/mosca": "^2.8.2",
     "@types/node": "^12.12.22",
-    "@types/config": "^0.0.36",
+    "@types/winston": "^2.4.4",
     "typescript": "^3.7.4"
   }
 }

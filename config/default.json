@@ -1,5 +1,9 @@
 {
   "database": "mongodb://database:27017/mqtt",
-  "port": 1883,
-  "sentry": "https://b3688df1d1494db7a60c6b18ba4ae324@sentry.io/1871196"
+  "port": 1884,
+  "sentry": "https://b3688df1d1494db7a60c6b18ba4ae324@sentry.io/1871196",
+  "api": {
+    "url": "http://localhost:8080",
+    "key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJmYXJtbGFiLnRlYW0iLCJpc3MiOiJmYXJtbGFiLnRlYW0iLCJqdGkiOiI2MDU3NDg1My1lZmEwLTQxZmYtYjBiNS1jMzU0ODg1MzcwYWQiLCJzdWIiOm51bGwsImVtYWlsIjoiYWRtaW5AZmFybWxhYi50ZWFtIiwiaWF0IjoxNTc4MDc3OTQ3fQ.X9R0tR5R56BhbuVOfhXSrSORl8QF3z-ooh2Owa6Z0Ws"
+  }
 }
