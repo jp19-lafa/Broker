@@ -1,0 +1,5 @@
+{
+  "database": "mongodb://database:27017/mqtt",
+  "port": 1883,
+  "sentry": "https://b3688df1d1494db7a60c6b18ba4ae324@sentry.io/1871196"
+}

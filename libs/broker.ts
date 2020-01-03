@@ -1,10 +1,11 @@
 import { Server, Client, Packet } from 'mosca';
+import { get as config } from 'config';
 
 var settings = {
-  port: 1883,
+  port: <number>config('port'),
   backend: {
     type: 'mongo',
-    url: 'mongodb://database:27017/mqtt',
+    url: <string>config('database'),
     pubsubCollection: 'ascoltatori',
     mongo: {}
   }
@@ -33,7 +34,9 @@ export class Broker {
     this.server.authorizeSubscribe = this.authorizeSubscribe;
   }
 
-  protected clientConnected(client: Client) { }
+  protected clientConnected(client: Client) {
+    console.log('Client Connected', client);
+  }
 
   protected clientDisconnected(client: Client) { }
 
@@ -44,7 +47,7 @@ export class Broker {
   }
 
   protected authenticate(client: Client, username: string, password: string, callback: (obj: any, authenticated: boolean) => void) {
-    const authenticated = (username === 'aquadeep_dev' && password.toString() === 'P9ae5Xp0VuCLs26dYeY8UyG8BMXJFYRW');
+    const authenticated = (username === 'farmlab' && password.toString() === 'ThisIsATestPasswordThatWeShouldChangeASAP');
     callback(null, authenticated);
   }
   protected authorizePublish(client: Client, topic: string, payload: string, callback: (obj: any, authenticated: boolean) => void) {
