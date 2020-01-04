@@ -6,7 +6,7 @@ import { log } from './logger';
 import { AuthenticationProvider } from '../providers/authentication';
 import { StatusProvider } from '../providers/status';
 
-var settings = {
+const settings = {
   port: <number>config('port'),
   backend: {
     type: 'mongo',
@@ -44,13 +44,21 @@ export class Broker {
   }
 
   protected clientConnected = (client: Client) => {
-    log.info(`Client Connected: ${client.id}`);
-    if (this.isNode(client.id)) this.statusProvider.updateStatus(client.id, true);
+    if (this.isNode(client.id)) {
+      log.info(`Client Connected: ${client.id}`);
+      this.statusProvider.updateStatus(client.id, true);
+    } else {
+      log.info(`Server Connected: ${client.id}`);
+    }
   }
 
   protected clientDisconnected = (client: Client) => {
-    log.info(`Client Disconnected: ${client.id}`);
-    if (this.isNode(client.id)) this.statusProvider.updateStatus(client.id, false);
+    if (this.isNode(client.id)) {
+      log.info(`Client Disconnected: ${client.id}`);
+      this.statusProvider.updateStatus(client.id, false);
+    } else {
+      log.info(`Server Disconnected: ${client.id}`);
+    }
   }
 
   protected published = (packet: Packet, client: Client) => { }
@@ -75,7 +83,7 @@ export class Broker {
   }
 
   protected isNode(client: string) {
-    return new RegExp('([0-9A-F]{2}[:]){5}([0-9A-F]{2})[/][a-z]+[/][a-z]+').test(client);
+    return new RegExp('^([0-9A-F]{2}[:]){5}([0-9A-F]{2})$').test(client);
   }
 
   protected isServer(client: string) {
