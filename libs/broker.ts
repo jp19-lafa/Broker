@@ -5,6 +5,7 @@ import { log } from './logger';
 // Providers
 import { AuthenticationProvider } from '../providers/authentication';
 import { StatusProvider } from '../providers/status';
+import { SensorProvider } from '../providers/sensor';
 
 const settings = {
   port: <number>config('port'),
@@ -21,6 +22,7 @@ export class Broker {
   protected server!: Server;
   protected authProvider = new AuthenticationProvider();
   protected statusProvider = new StatusProvider();
+  protected sensorProvider = new SensorProvider();
 
   constructor() {
     this.statusProvider.resetStatus().then(() => {
@@ -61,7 +63,19 @@ export class Broker {
     }
   }
 
-  protected published = (packet: Packet, client: Client) => { }
+  // farmlab/AA:AA:AA/sensor/lightint
+
+  protected published = (packet: Packet, client: Client) => {
+    if (!this.isValidFarmUpdate(packet.topic)) return;
+    switch (this.getIOTypeFromTopic(packet.topic)) {
+      case 'sensor':
+        this.sensorProvider.updateSensorValue(client.id, packet.topic.split('/')[3], packet.payload.toString())
+        break;
+      case 'actuator':
+        log.debug(`Actuator Update Request for ${client.id} / Actuator ${packet.topic.split('/')[3]} to ${packet.payload.toString()}`);
+        break;
+    }
+  }
 
   protected ready() {
     log.info(`MQTT Server (PORT ${settings.port}/INTERNAL)`);
@@ -73,12 +87,14 @@ export class Broker {
     if (!authorized) log.debug(`Connection Failed for ${client.id} (UNAUTHORIZED)`);
     callback(null, authorized);
   }
+
   protected authorizePublish = async (client: Client, topic: string, payload: string, callback: (obj: any, authenticated: boolean) => void) => {
-    const authorized: boolean = (topic.split('/').length === 3 && topic.split('/')[0] === client.id);
+    const authorized: boolean = ((this.isValidFarmUpdate(topic) && this.getClientFromTopic(topic) === client.id) || this.isServer(client.id));
     callback(null, authorized);
   }
+
   protected authorizeSubscribe = async (client: Client, topic: string, callback: (obj: any, authenticated: boolean) => void) => {
-    const authorized: boolean = (topic.split('/')[0] === client.id || client.id.includes('core-server'));
+    const authorized: boolean = (this.getClientFromTopic(topic) === client.id || this.isServer(client.id));
     callback(null, authorized);
   }
 
@@ -90,6 +106,20 @@ export class Broker {
     return client.includes('core-server');
   }
 
-  public Listen() { }
+  protected isValidFarmUpdate(topic: string) {
+    if(topic.split('/').length !== 4) return false;
+    if(topic.split('/')[0] !== 'farmlab') return false;
+    if(!this.isNode(topic.split('/')[1])) return false;
+    if(topic.split('/')[2] !== 'sensor' && topic.split('/')[2] !== 'actuator') return false;
+    return true;
+  }
+
+  protected getClientFromTopic(topic: string) {
+    return topic.split('/')[1];
+  }
+
+  protected getIOTypeFromTopic(topic: string) {
+    return topic.split('/')[2];
+  }
 
 }
