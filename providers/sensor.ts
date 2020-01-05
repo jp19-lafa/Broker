@@ -1,11 +1,14 @@
 import got from 'got';
 import { get as config } from 'config';
 import { log } from '../libs/logger';
-import { Packet, Client } from 'mosca';
 
 export class SensorProvider {
 
-  constructor() {}
+  protected key: string;
+
+  constructor(key: string) {
+    this.key = key;
+  }
 
   /**
    * Change the status of a node
@@ -17,14 +20,14 @@ export class SensorProvider {
     return new Promise<boolean>((resolve, reject) => {
       log.debug(`Sensor Update Request for ${client} / Sensor ${sensor} to ${payload}`);
       got.post(`mqtt/sensor`, {
-        prefixUrl: config('api.url'),
+        prefixUrl: config('api'),
         json: {
           client,
           sensor,
           payload
         },
         headers: {
-          Authorization: `Bearer ${config('api.key')}`
+          Authorization: `Bearer ${this.key}`
         }
       }).then(data => {
         return resolve(true);
@@ -34,20 +37,4 @@ export class SensorProvider {
     });
   }
 
-}
-
-export interface IODevice {
-  type: IOType;
-  name: string;
-}
-
-export enum IOType {
-  sensor = 'sensor',
-  actuator = 'actuator'
-}
-
-export interface IOUpdate {
-  device: IODevice,
-  packet: Packet,
-  client: Client
 }

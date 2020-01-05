@@ -6,6 +6,7 @@ import { log } from './logger';
 import { AuthenticationProvider } from '../providers/authentication';
 import { StatusProvider } from '../providers/status';
 import { SensorProvider } from '../providers/sensor';
+import { KeyProvider } from '../providers/key';
 
 const settings = {
   port: <number>config('port'),
@@ -20,11 +21,16 @@ const settings = {
 export class Broker {
 
   protected server!: Server;
-  protected authProvider = new AuthenticationProvider();
-  protected statusProvider = new StatusProvider();
-  protected sensorProvider = new SensorProvider();
+  protected authProvider: AuthenticationProvider;
+  protected statusProvider: StatusProvider;
+  protected sensorProvider: SensorProvider;
 
   constructor() {
+    const key = new KeyProvider().generateInternalToken();
+    this.authProvider = new AuthenticationProvider(key);
+    this.statusProvider = new StatusProvider(key);
+    this.sensorProvider = new SensorProvider(key);
+
     this.statusProvider.resetStatus().then(() => {
       this.server = new Server(settings);
       this.registerCallbacks();

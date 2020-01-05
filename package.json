@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon --watch '**/*.ts' --ignore 'node_modules' --exec 'ts-node' index.ts",
     "build": "tsc --build",
-    "docker:build": "docker build -f docker/Dockerfile .",
+    "docker:deploy": "docker build -f docker/Dockerfile -t registry.mira.systems/farmlab/broker . && docker push registry.mira.systems/farmlab/broker:latest",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,12 +23,14 @@
     "@sentry/node": "^5.10.2",
     "config": "^3.2.4",
     "got": "^10.2.1",
+    "jsonwebtoken": "^8.5.1",
     "mosca": "^2.8.3",
     "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/config": "^0.0.36",
     "@types/got": "^9.6.9",
+    "@types/jsonwebtoken": "^8.3.5",
     "@types/mosca": "^2.8.2",
     "@types/node": "^12.12.22",
     "@types/winston": "^2.4.4",

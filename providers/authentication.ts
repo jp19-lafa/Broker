@@ -4,7 +4,11 @@ import { log } from '../libs/logger';
 
 export class AuthenticationProvider {
 
-  constructor() {}
+  protected key: string;
+
+  constructor(key: string) {
+    this.key = key;
+  }
 
   /**
    * Check whether a client is allowed to connect
@@ -17,13 +21,13 @@ export class AuthenticationProvider {
       log.debug(`Authorization Request for ${clientId}`);
       if (clientId !== username && !username.includes('core-server')) return resolve(false);
       got.post(`mqtt/authenticate`, {
-        prefixUrl: config('api.url'),
+        prefixUrl: config('api'),
         json: {
           client: clientId,
           key: key
         },
         headers: {
-          Authorization: `Bearer ${config('api.key')}`
+          Authorization: `Bearer ${this.key}`
         }
       }).then(data => {
         return resolve(true);
