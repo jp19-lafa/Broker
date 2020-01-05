@@ -105,3 +105,6 @@ dist
 
 logs
 keys
+
+config/
+!config/default.json
