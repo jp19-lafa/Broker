@@ -19,12 +19,13 @@ export class AuthenticationProvider {
   async isAllowedToConnect(clientId: string, username: string, key: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       log.debug(`Authorization Request for ${clientId}`);
+      if(!clientId || !username || !key) return resolve(false);
       if (clientId !== username && !username.includes('core-server')) return resolve(false);
       got.post(`mqtt/authenticate`, {
         prefixUrl: config('api'),
         json: {
           client: clientId,
-          key: key
+          key: key.toString()
         },
         headers: {
           Authorization: `Bearer ${this.key}`
