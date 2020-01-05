@@ -8,7 +8,8 @@ import { init as Sentry } from '@sentry/node';
 
 Sentry({
   dsn: config('sentry'),
-  environment: process.env.ENV || 'development'
+  environment: process.env.NODE_ENV || 'development',
+  release: 'farmlab-broker@' + process.env.npm_package_version
 });
 
 new Broker();
