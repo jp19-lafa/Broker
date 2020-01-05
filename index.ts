@@ -14,6 +14,6 @@ Sentry({
   release: 'farmlab-broker@' + version
 });
 
-log.info(`Starting APP (environment: ${process.env.NODE_ENV} | version: farmlab-broker@ + ${version})`)
+log.info(`Starting APP (environment: ${process.env.NODE_ENV} | version: farmlab-broker@${version})`)
 
 new Broker();
