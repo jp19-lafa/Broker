@@ -11,7 +11,7 @@ import { log } from './libs/logger';
 Sentry({
   dsn: config('sentry'),
   environment: process.env.NODE_ENV,
-  release: 'farmlab-broker@' + version
+  release: version
 });
 
 log.info(`Starting APP (environment: ${process.env.NODE_ENV} | version: farmlab-broker@${version})`)
