@@ -84,7 +84,7 @@ export class Broker {
   }
 
   protected ready() {
-    log.info(`MQTT Server (PORT ${settings.port}/INTERNAL)`);
+    log.info(`MQTT Server (PORT: ${settings.port})`);
   }
 
   protected authenticate = async (client: Client, username: string, password: string, callback: (obj: any, authenticated: boolean) => void) => {

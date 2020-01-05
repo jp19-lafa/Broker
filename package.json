@@ -1,6 +1,6 @@
 {
   "name": "mqtt-broker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "FarmLab MQTT Broker",
   "main": "dist/index.js",
   "scripts": {
@@ -32,7 +32,7 @@
     "@types/got": "^9.6.9",
     "@types/jsonwebtoken": "^8.3.5",
     "@types/mosca": "^2.8.2",
-    "@types/node": "^12.12.22",
+    "@types/node": "^12.12.24",
     "@types/winston": "^2.4.4",
     "typescript": "^3.7.4"
   }
