@@ -89,7 +89,7 @@ export class Broker {
 
   protected authenticate = async (client: Client, username: string, password: string, callback: (obj: any, authenticated: boolean) => void) => {
     log.debug(`Connection Attempt by ${client.id}`);
-    const authorized: boolean = await this.authProvider.isAllowedToConnect(client.id, username, password.toString());
+    const authorized: boolean = await this.authProvider.isAllowedToConnect(client.id, username, password);
     if (!authorized) log.debug(`Connection Failed for ${client.id} (UNAUTHORIZED)`);
     callback(null, authorized);
   }
